@@ -1,8 +1,9 @@
-module github.com/alex-appy-love-story/worker-template
+module github.com/alex-appy-love-story/backend
 
 go 1.18
 
 require (
+	github.com/go-chi/chi/v5 v5.0.10
 	github.com/hibiken/asynq v0.24.2-0.20230908153724-6a7bf2ceff1e
 	gorm.io/driver/mysql v1.5.2
 	gorm.io/gorm v1.25.5

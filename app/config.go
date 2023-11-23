@@ -2,7 +2,6 @@ package app
 
 import (
 	"os"
-	"strconv"
 )
 
 type DatabaseConfig struct {
@@ -14,7 +13,6 @@ type DatabaseConfig struct {
 type Config struct {
 	RedisAddress string
 	DatabaseInfo DatabaseConfig
-	WorkerCount  int
 }
 
 // Required Configs:
@@ -30,7 +28,6 @@ func LoadConfig() Config {
 			User:     "user",
 			Password: "password",
 			Address:  "localhost:3306"},
-		WorkerCount: 5,
 	}
 
 	if redisAddr, exists := os.LookupEnv("REDIS_ADDR"); exists {
@@ -47,12 +44,6 @@ func LoadConfig() Config {
 
 	if dbPassword, exists := os.LookupEnv("DB_PASSWORD"); exists {
 		cfg.DatabaseInfo.Password = dbPassword
-	}
-
-	if workerCount, exists := os.LookupEnv("WORKER_COUNT"); exists {
-		if val, err := strconv.Atoi(workerCount); err != nil {
-			cfg.WorkerCount = val
-		}
 	}
 
 	return cfg

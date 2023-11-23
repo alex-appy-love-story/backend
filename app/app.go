@@ -3,8 +3,10 @@ package app
 import (
 	"context"
 	"fmt"
+	"net/http"
+	"time"
 
-	"github.com/alex-appy-love-story/worker-template/tasks"
+	"github.com/alex-appy-love-story/backend/tasks"
 	"github.com/hibiken/asynq"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -14,6 +16,7 @@ type App struct {
 	Config      Config
 	AsynqClient *asynq.Client
 	DBClient    *gorm.DB
+	router      http.Handler
 }
 
 func New(config Config) *App {
@@ -45,9 +48,13 @@ func (a *App) connectDB(ctx context.Context) error {
 	return nil
 }
 
+func (a *App) getApp() *App {
+	return a
+}
+
 func (a *App) Start(ctx context.Context) error {
 
-	server := asynq.NewServer(
+	asynq_server := asynq.NewServer(
 		asynq.RedisClientOpt{Addr: a.Config.RedisAddress},
 		asynq.Config{
 			Concurrency: 5,
@@ -68,31 +75,51 @@ func (a *App) Start(ctx context.Context) error {
 		}
 	}()
 
-	fmt.Println("Starting server...")
+	a.router = loadRoutes(a)
+	http_server := &http.Server{
+		Addr:    ":3000",
+		Handler: a.router,
+	}
 
-	ch := make(chan error, 1)
+	fmt.Println("Server started!")
 
 	mux := asynq.NewServeMux()
 
 	taskHanlder := TaskHandler{app: a}
 	mux.Use(loggingMiddleware)
-	mux.Use(taskHanlder.ContextMiddleware)
+	mux.Use(taskHanlder.asynqContextMiddleware)
 
 	tasks.RegisterTopic(mux)
 
+	asynq_ch := make(chan error, 1)
+	http_ch := make(chan error, 1)
+
 	go func() {
-		err := server.Run(mux)
+		err := http_server.ListenAndServe()
 		if err != nil {
-			ch <- fmt.Errorf("Failed to start server: %w", err)
+			http_ch <- fmt.Errorf("failed to start http server: %w", err)
 		}
-		close(ch)
+		close(http_ch)
+	}()
+
+	go func() {
+		err := asynq_server.Run(mux)
+		if err != nil {
+			asynq_ch <- fmt.Errorf("Failed to start asynq server: %w", err)
+		}
+		close(asynq_ch)
 	}()
 
 	select {
-	case err := <-ch:
+	case err := <-asynq_ch:
+		return err
+	case err := <-http_ch:
 		return err
 	case <-ctx.Done():
-		server.Shutdown()
-		return nil
+		timeout, cancel := context.WithTimeout(context.Background(), time.Second*10)
+		defer cancel()
+
+		asynq_server.Shutdown()
+		return http_server.Shutdown(timeout)
 	}
 }

@@ -1,30 +1,59 @@
-package application
+package app
 
 import (
-  "os"
-  "strconv"
+	"os"
+	"strconv"
 )
+
+type DatabaseConfig struct {
+	User     string
+	Password string
+	Address  string
+}
 
 type Config struct {
 	RedisAddress string
-	ServerPort   uint16
+	DatabaseInfo DatabaseConfig
+	WorkerCount  int
 }
 
+// Required Configs:
+// - REDIS_ADDR
+// - DB_ADDRESS
+// - DB_USER
+// - DB_PASSWORD
+// - WORKER_COUNT
 func LoadConfig() Config {
 	cfg := Config{
 		RedisAddress: "localhost:6379",
-		ServerPort:   3000,
+		DatabaseInfo: DatabaseConfig{
+			User:     "user",
+			Password: "password",
+			Address:  "localhost:3306"},
+		WorkerCount: 5,
 	}
-  
-  if redisAddr, exists := os.LookupEnv("REDIS_ADDR"); exists {
-    cfg.RedisAddress = redisAddr
-  }
 
-  if serverPort, exists := os.LookupEnv("SERVER_PORT"); exists {
-    if port, err := strconv.ParseUint(serverPort, 10, 16); err == nil {
-      cfg.ServerPort = uint16(port)
-    }
-  }
+	if redisAddr, exists := os.LookupEnv("REDIS_ADDR"); exists {
+		cfg.RedisAddress = redisAddr
+	}
 
-  return cfg
+	if dbAddress, exists := os.LookupEnv("DB_ADDRESS"); exists {
+		cfg.DatabaseInfo.Address = dbAddress
+	}
+
+	if dbUser, exists := os.LookupEnv("DB_USER"); exists {
+		cfg.DatabaseInfo.User = dbUser
+	}
+
+	if dbPassword, exists := os.LookupEnv("DB_PASSWORD"); exists {
+		cfg.DatabaseInfo.Password = dbPassword
+	}
+
+	if workerCount, exists := os.LookupEnv("WORKER_COUNT"); exists {
+		if val, err := strconv.Atoi(workerCount); err != nil {
+			cfg.WorkerCount = val
+		}
+	}
+
+	return cfg
 }

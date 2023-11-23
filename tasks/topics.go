@@ -1,0 +1,9 @@
+package tasks
+
+import (
+	"github.com/hibiken/asynq"
+)
+
+func RegisterTopic(mux *asynq.ServeMux) {
+	// Register tasks here...
+}

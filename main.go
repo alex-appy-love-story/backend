@@ -1,17 +1,16 @@
 package main
 
 import (
-  "context"
-	"fmt"
+	"context"
 
-  "github.com/alex-appy-love-story/backend/app"
+	"github.com/alex-appy-love-story/worker-template/app"
 )
 
-func main() {
-  app := application.New()
+func printNumber(n int) int {
+	return n
+}
 
-  err := app.Start(context.TODO())
-  if err != nil {
-    fmt.Println("failed to start app:", err)
-  }
+func main() {
+	app := app.New(app.LoadConfig())
+	app.Start(context.Background())
 }

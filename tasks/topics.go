@@ -6,4 +6,5 @@ import (
 
 func RegisterTopic(mux *asynq.ServeMux) {
 	// Register tasks here...
+	mux.HandleFunc("task:perform", HandlePerformStepTask)
 }

@@ -86,9 +86,9 @@ func (a *App) Start(ctx context.Context) error {
 
 	mux := asynq.NewServeMux()
 
-	taskHanlder := TaskHandler{app: a}
+	//taskHanlder := TaskHandler{app: a}
 	mux.Use(loggingMiddleware)
-	mux.Use(taskHanlder.asynqContextMiddleware)
+	//mux.Use(taskHanlder.asynqContextMiddleware)
 
 	tasks.RegisterTopic(mux)
 

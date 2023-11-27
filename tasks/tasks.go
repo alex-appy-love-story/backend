@@ -1,20 +1,15 @@
 package tasks
 
 import (
-	"encoding/json"
+	"context"
+	"fmt"
 
-	"github.com/alex-appy-love-story/backend/model"
 	"github.com/hibiken/asynq"
 )
 
-const (
-    TypeStartOrder = "task:perform"
-)
+func HandlePerformStepTask(ctx context.Context, t *asynq.Task) error {
+	//appCtx := GetContext(ctx)
 
-func NewStartOrderTask(orderInfo model.OrderInfo) (*asynq.Task, error) {
-    payload, err := json.Marshal(orderInfo)
-    if err != nil {
-        return nil, err
-    }
-    return asynq.NewTask(TypeStartOrder, payload), nil
+	fmt.Println("Got response")
+	return nil
 }

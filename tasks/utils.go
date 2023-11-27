@@ -7,18 +7,35 @@ import (
 	"gorm.io/gorm"
 )
 
-func getClient(ctx context.Context) (gorm_client *gorm.DB, asynq_client *asynq.Client) {
+type AppContext struct {
+	GormClient     *gorm.DB
+	AsynqClient    *asynq.Client
+	AsynqInspector *asynq.Inspector
+	NextQueue      string
+	ServerQueue    string
+}
 
-	gorm_client = nil
-	asynq_client = nil
+
+func GetContext(ctx context.Context) (appCtx AppContext) {
+
+    appCtx.GormClient = nil
+    appCtx.AsynqClient = nil
 
 	if val := ctx.Value("asynq_client"); val != nil {
-		asynq_client = val.(*asynq.Client)
+		appCtx.AsynqClient = val.(*asynq.Client)
 	}
 
 	if val := ctx.Value("db_client"); val != nil {
-		gorm_client = val.(*gorm.DB)
+		appCtx.GormClient = val.(*gorm.DB)
 	}
+
+	if val := ctx.Value("next_queue"); val != nil {
+		appCtx.NextQueue = val.(string)
+	}
+
+	if val := ctx.Value("server_queue"); val != nil {
+		appCtx.ServerQueue = val.(string)
+    }
 
 	return
 }

@@ -32,10 +32,11 @@ func New(config Config) *App {
 
 func (a *App) connectDB(ctx context.Context) error {
 	dsn := fmt.Sprintf(
-		"%s:%s@tcp(%s)/db?charset=utf8mb4&parseTime=True&loc=Local",
-		a.Config.DatabaseInfo.User,
-		a.Config.DatabaseInfo.Password,
-		a.Config.DatabaseInfo.Address,
+		"%s:%s@tcp(%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+		a.Config.DatabaseConfig.User,
+		a.Config.DatabaseConfig.Password,
+		a.Config.DatabaseConfig.Address,
+		a.Config.DatabaseConfig.DatabaseName,
 	)
 
 	gorm, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})

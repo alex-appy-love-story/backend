@@ -5,14 +5,15 @@ import (
 )
 
 type DatabaseConfig struct {
-	User     string
-	Password string
-	Address  string
+	User         string
+	Password     string
+	Address      string
+	DatabaseName string
 }
 
 type Config struct {
-	RedisAddress string
-	DatabaseInfo DatabaseConfig
+	RedisAddress   string
+	DatabaseConfig DatabaseConfig
 }
 
 // Required Configs:
@@ -24,10 +25,12 @@ type Config struct {
 func LoadConfig() Config {
 	cfg := Config{
 		RedisAddress: "localhost:6379",
-		DatabaseInfo: DatabaseConfig{
-			User:     "user",
-			Password: "password",
-			Address:  "localhost:3306"},
+		DatabaseConfig: DatabaseConfig{
+			User:         "user",
+			Password:     "password",
+			Address:      "localhost:3306",
+			DatabaseName: "db",
+		},
 	}
 
 	if redisAddr, exists := os.LookupEnv("REDIS_ADDR"); exists {
@@ -35,15 +38,19 @@ func LoadConfig() Config {
 	}
 
 	if dbAddress, exists := os.LookupEnv("DB_ADDRESS"); exists {
-		cfg.DatabaseInfo.Address = dbAddress
+		cfg.DatabaseConfig.Address = dbAddress
 	}
 
 	if dbUser, exists := os.LookupEnv("DB_USER"); exists {
-		cfg.DatabaseInfo.User = dbUser
+		cfg.DatabaseConfig.User = dbUser
 	}
 
 	if dbPassword, exists := os.LookupEnv("DB_PASSWORD"); exists {
-		cfg.DatabaseInfo.Password = dbPassword
+		cfg.DatabaseConfig.Password = dbPassword
+	}
+
+	if dbName, exists := os.LookupEnv("DB_NAME"); exists {
+		cfg.DatabaseConfig.DatabaseName = dbName
 	}
 
 	return cfg

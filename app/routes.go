@@ -12,9 +12,9 @@ import (
 func loadRoutes(a *App) *chi.Mux {
 	router := chi.NewRouter()
 
-	//taskHanlder := TaskHandler{app: a}
+	taskHanlder := TaskHandler{app: a}
 	router.Use(middleware.Logger)
-	//router.Use(taskHanlder.routerContextMiddleware)
+	router.Use(taskHanlder.routerContextMiddleware)
 
 	router.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)

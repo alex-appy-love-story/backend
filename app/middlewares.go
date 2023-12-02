@@ -15,13 +15,13 @@ type TaskHandler struct {
 
 type Task func(ctx context.Context, t *asynq.Task) error
 
-// func (th *TaskHandler) asynqContextMiddleware(h asynq.Handler) asynq.Handler {
-// 	return asynq.HandlerFunc(func(ctx context.Context, t *asynq.Task) error {
-// 		ctx = context.WithValue(ctx, "asynq_client", th.app.AsynqClient)
-// 		ctx = context.WithValue(ctx, "db_client", th.app.DBClient)
-// 		return h.ProcessTask(ctx, t)
-// 	})
-// }
+ func (th *TaskHandler) asynqContextMiddleware(h asynq.Handler) asynq.Handler {
+ 	return asynq.HandlerFunc(func(ctx context.Context, t *asynq.Task) error {
+ 		ctx = context.WithValue(ctx, "asynq_client", th.app.AsynqClient)
+ 		ctx = context.WithValue(ctx, "db_client", th.app.DBClient)
+ 		return h.ProcessTask(ctx, t)
+ 	})
+ }
 
 func loggingMiddleware(h asynq.Handler) asynq.Handler {
 	return asynq.HandlerFunc(func(ctx context.Context, t *asynq.Task) error {

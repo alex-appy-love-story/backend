@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -28,6 +29,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Fatalf("could not create task: %v", err)
     }
+    fmt.Println("ENQUEING")
     info, err := ctx.AsynqClient.Enqueue(task, asynq.Queue("order"), asynq.MaxRetry(0))
     if err != nil {
         log.Fatalf("could not enqueue task: %v", err)

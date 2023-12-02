@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"log"
+	"net/http"
 	"time"
 
 	"github.com/hibiken/asynq"
@@ -35,11 +36,11 @@ func loggingMiddleware(h asynq.Handler) asynq.Handler {
 	})
 }
 
-// func (th *TaskHandler) routerContextMiddleware(next http.Handler) http.Handler {
-// 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-// 		ctx := r.Context()
-// 		ctx = context.WithValue(ctx, "asynq_client", th.app.AsynqClient)
-// 		ctx = context.WithValue(ctx, "db_client", th.app.DBClient)
-// 		next.ServeHTTP(rw, r.WithContext(ctx))
-// 	})
-// }
+ func (th *TaskHandler) routerContextMiddleware(next http.Handler) http.Handler {
+ 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+ 		ctx := r.Context()
+ 		ctx = context.WithValue(ctx, "asynq_client", th.app.AsynqClient)
+ 		ctx = context.WithValue(ctx, "db_client", th.app.DBClient)
+ 		next.ServeHTTP(rw, r.WithContext(ctx))
+ 	})
+ }

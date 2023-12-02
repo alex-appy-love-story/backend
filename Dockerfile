@@ -14,4 +14,4 @@ WORKDIR /app
 
 COPY --from=BuildStage /app .
 
-CMD ["./worker-template"]
+CMD ["./backend"]

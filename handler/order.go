@@ -18,6 +18,7 @@ type OrderInfo struct {
 }
 
 func Create(w http.ResponseWriter, r *http.Request) {
+    fmt.Println("Got request")
 	ctx := tasks.GetContext(r.Context())
     orderInfo := &model.OrderInfo{}
 

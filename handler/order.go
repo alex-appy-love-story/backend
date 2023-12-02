@@ -7,10 +7,11 @@ import (
 
 	"github.com/alex-appy-love-story/backend/model"
 	"github.com/alex-appy-love-story/backend/tasks"
+	"github.com/hibiken/asynq"
 )
 
 type OrderInfo struct {
-	UserID  uint `json:"user_id"`
+    Username string `json:"username"`
 	TokenID uint `json:"token_id"`
 	Amount  uint `json:"amount"`
 }
@@ -27,7 +28,7 @@ func Create(w http.ResponseWriter, r *http.Request) {
     if err != nil {
         log.Fatalf("could not create task: %v", err)
     }
-    info, err := ctx.AsynqClient.Enqueue(task)
+    info, err := ctx.AsynqClient.Enqueue(task, asynq.Queue("order"), asynq.MaxRetry(0))
     if err != nil {
         log.Fatalf("could not enqueue task: %v", err)
     }

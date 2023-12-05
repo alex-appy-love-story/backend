@@ -5,6 +5,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/rs/cors"
 
 	"github.com/alex-appy-love-story/backend/handler"
 )
@@ -13,6 +14,14 @@ func loadRoutes(a *App) *chi.Mux {
 	router := chi.NewRouter()
 
 	taskHanlder := TaskHandler{app: a}
+
+	c := cors.New(cors.Options{
+		AllowedOrigins: []string{"*"},
+		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		Debug:          true,
+	})
+	router.Use(c.Handler)
+
 	router.Use(middleware.Logger)
 	router.Use(taskHanlder.routerContextMiddleware)
 

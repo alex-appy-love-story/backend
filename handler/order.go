@@ -20,6 +20,8 @@ func Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	log.Printf("Paylod: %+v\n", orderInfo)
+
 	task, err := tasks.NewStartOrderTask(*orderInfo)
 	if err != nil {
 		log.Fatalf("could not create task: %v", err)
